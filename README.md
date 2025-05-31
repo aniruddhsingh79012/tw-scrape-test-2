@@ -1,323 +1,477 @@
-# Bittensor-Optimized Twitter Scraper
+# 🚀 Bittensor Twitter Mining System
 
-A high-performance, ban-resistant Twitter scraping system optimized for Bittensor Subnet 13 (Data Universe) with support for 1M+ daily scrapes using 50 accounts and 500 proxies.
+A production-ready Twitter mining system designed for Bittensor subnet with PostgreSQL storage in exact data-universe-main format.
 
-## 🚀 Features
+## 🎯 Features
 
-### Core Capabilities
-- **1M+ Daily Scrapes**: Optimized for high-volume data collection
-- **50 Account Management**: Intelligent rotation with ban prevention
-- **500 Proxy Rotation**: Distributed load across proxy pool
-- **Bittensor Subnet Optimization**: Aligned with subnet scoring mechanisms
-- **Dual Database Storage**: PostgreSQL + SQLite (Bittensor compatible)
-- **Real-time Monitoring**: Comprehensive statistics and reporting
+### ✅ **Bittensor Compliance**
+- **100% data-universe-main compatible** storage format
+- **PostgreSQL backend** with exact Bittensor schema
+- **DataSource.X (source=2)** for Twitter/X data
+- **TimeBucket calculation** (hours since epoch)
+- **Proper indexing** for validator compatibility
 
-### Ban Prevention & Robustness
-- **Smart Account Rotation**: 15-minute cooldowns between uses
-- **Proxy Load Balancing**: 5-minute cooldowns with failure tracking
-- **Ban Detection**: Automatic detection and 24-hour recovery
-- **Rate Limiting**: Configurable request limits per account/proxy
-- **Error Recovery**: Automatic retry with exponential backoff
+### ✅ **Production Ready**
+- **Proxy rotation** with 500+ proxies
+- **Account management** with 50+ Twitter accounts
+- **Rate limiting protection** and ban recovery
+- **Continuous mining** with configurable targets
+- **Real-time monitoring** and statistics
 
-### Bittensor Subnet Alignment
-- **Data Freshness Priority**: Recent tweets score higher
-- **Desirability Tracking**: Focus on trending and valuable content
-- **Quality Filtering**: Engagement-based content selection
-- **Label Optimization**: Hashtag-based categorization
-- **Time Bucket Organization**: Hourly data grouping
+### ✅ **High Performance**
+- **Concurrent processing** with async operations
+- **Smart proxy selection** and health monitoring
+- **Automatic recovery** from bans and failures
+- **Efficient storage** with PostgreSQL ACID compliance
+- **No hanging issues** - direct database operations
 
-## 📁 Project Structure
+## 📋 Requirements
 
-```
-├── enhanced_account_manager.py     # Account & proxy management
-├── enhanced_twitter_scraper.py     # High-performance scraper
-├── optimized_data_storage.py       # Dual database storage
-├── bittensor_optimized_miner.py    # Main orchestrator
-├── setup_and_run.py               # Setup & execution script
-├── twitteracc.txt                 # Twitter accounts (50 accounts)
-├── proxy.txt                      # Proxy list (500 proxies)
-├── config.json                    # Configuration file
-└── README.md                      # This file
-```
+### System Requirements
+- **Python 3.8+**
+- **PostgreSQL 12+**
+- **Linux/Ubuntu** (recommended)
+- **4GB+ RAM**
+- **10GB+ storage**
 
-## 🛠 Installation & Setup
-
-### Prerequisites
-- Python 3.8+
-- PostgreSQL 12+
-- 50 Twitter accounts with auth tokens
-- 500 working proxies
-
-### Quick Start
-
-1. **Clone and Setup**
+### Python Dependencies
 ```bash
-git clone <repository>
-cd twitter-scraper
-python setup_and_run.py
+pip install asyncio aiohttp psycopg2-binary twscrape
 ```
 
-2. **Account Format** (twitteracc.txt)
-```
-username:password:email:email_password:auth_token
-```
-
-3. **Proxy Format** (proxy.txt)
-```
-ip:port:username:password
-```
-
-### Manual Installation
-
-1. **Install Dependencies**
+### PostgreSQL Setup
 ```bash
-pip install aiohttp psycopg2-binary requests schedule python-dotenv
-```
+# Install PostgreSQL
+sudo apt update
+sudo apt install postgresql postgresql-contrib
 
-2. **Setup PostgreSQL**
-```bash
 # Create database
-createdb postgres
-# Update credentials in config.json
+sudo -u postgres createdb bittensor_mining
+
+# Set password
+sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+
+# Test connection
+psql -h localhost -U postgres -d bittensor_mining -c "SELECT version();"
 ```
 
-3. **Run System**
+## 🔧 Installation
+
+### 1. Clone Repository
 ```bash
-# Test mode (5 minutes)
-python bittensor_optimized_miner.py test 5
-
-# Continuous mode
-python bittensor_optimized_miner.py
+git clone <repository-url>
+cd twitter-mining-system
 ```
 
-## ⚙️ Configuration
-
-### Database Configuration
-```json
-{
-  "postgres": {
-    "dbname": "postgres",
-    "user": "postgres", 
-    "password": "your_password",
-    "host": "localhost",
-    "port": 5432
-  }
-}
+### 2. Install Dependencies
+```bash
+pip install -r requirements.txt
+# OR manually:
+pip install asyncio aiohttp psycopg2-binary twscrape
 ```
 
-### Performance Tuning
-```json
-{
-  "scraping": {
-    "target_tweets_per_day": 1000000,
-    "max_concurrent_requests": 20,
-    "account_cooldown_minutes": 15,
-    "proxy_cooldown_minutes": 5
-  }
-}
+### 3. Setup Configuration Files
+
+#### **Twitter Accounts (twitteracc.txt)**
+```
+username1:password1:email1:email_password1:auth_token1
+username2:password2:email2:email_password2:auth_token2
+...
 ```
 
-## 📊 Performance Targets
+#### **Proxies (proxy.txt)**
+```
+host1:port1:username1:password1
+host2:port2:username2:password2
+...
+```
 
-| Metric | Target | Actual Performance |
-|--------|--------|-------------------|
-| Daily Tweets | 1,000,000+ | Optimized for target |
-| Hourly Tweets | ~42,000 | 6 batches of ~7K |
-| Per Minute | ~700 | Distributed load |
-| Account Utilization | 50 accounts | Smart rotation |
-| Proxy Utilization | 500 proxies | Load balanced |
-| Ban Rate | <1% | Robust prevention |
-
-## 🎯 Bittensor Subnet Optimization
-
-### Scoring Factors
-1. **Data Freshness (40%)**: Recent tweets score higher
-2. **Engagement Quality (30%)**: Likes, retweets, replies
-3. **Content Quality (20%)**: Length, media, originality
-4. **Desirability (10%)**: Relevant hashtags and topics
-
-### Target Keywords
+### 4. Configure PostgreSQL
+Update database credentials in `proxy_twitter_miner.py`:
 ```python
-HIGH_VALUE_KEYWORDS = [
-    "#bitcoin", "#bittensor", "#tao", "#crypto", "#ai",
-    "#blockchain", "#defi", "#web3", "#ethereum"
-]
+conn = psycopg2.connect(
+    host="localhost",
+    database="bittensor_mining",
+    user="postgres",
+    password="your_password_here"  # Change this
+)
 ```
 
-### Time Optimization
-- **Current Hour**: Maximum freshness score
-- **Last 6 Hours**: High freshness score  
-- **Last 24 Hours**: Moderate freshness score
-- **Older**: Minimal score
+## 🚀 Usage
 
-## 📈 Monitoring & Analytics
+### **Continuous Mining (Production)**
+```bash
+# Mine 1667 tweets/hour (40K tweets/day)
+python proxy_twitter_miner.py --continuous 1667
 
-### Real-time Statistics
-- Tweets scraped per second
-- Account/proxy utilization
-- Success/failure rates
-- Ban incidents
-- Storage efficiency
+# Conservative mining (24K tweets/day)
+python proxy_twitter_miner.py --continuous 1000
 
-### Daily Reports
-```json
-{
-  "date": "2025-01-31",
-  "performance": {
-    "tweets_scraped_24h": 1050000,
-    "target_achievement": 105.0,
-    "target_met": true
-  },
-  "accounts": {
-    "active_accounts": 49,
-    "banned_accounts": 1,
-    "success_rate_24h": 98.5
-  }
-}
+# High-volume mining (72K tweets/day)
+python proxy_twitter_miner.py --continuous 3000
 ```
 
-### Log Files
-- `bittensor_miner.log`: Main application logs
-- `daily_report_YYYYMMDD.json`: Daily performance reports
-- `enhanced_accounts.db`: Account management database
+### **Test Mining**
+```bash
+# Test for 5 minutes
+python proxy_twitter_miner.py --test 5
 
-## 🔧 Advanced Usage
-
-### Custom Scraping Targets
-```python
-# Modify target keywords in bittensor_optimized_miner.py
-base_keywords = [
-    "#your_custom_hashtag",
-    "#trending_topic"
-]
+# Scrape specific number of tweets
+python proxy_twitter_miner.py --scrape 100
 ```
 
-### Database Queries
+### **System Monitoring**
+```bash
+# Show statistics
+python proxy_twitter_miner.py --stats
+
+# Show storage information
+python proxy_twitter_miner.py --storage-info
+
+# Test proxy health
+python proxy_twitter_miner.py --test-proxies
+```
+
+## 📊 Data Storage
+
+### **Bittensor Format (PostgreSQL)**
+
+#### **Table Schema**
 ```sql
--- Get recent tweets
-SELECT * FROM data_entities 
-WHERE datetime > NOW() - INTERVAL '1 hour'
-ORDER BY datetime DESC;
-
--- Get tweets by hashtag
-SELECT * FROM data_entities 
-WHERE '#bitcoin' = ANY(hashtags);
+CREATE TABLE DataEntity (
+    uri TEXT PRIMARY KEY,
+    datetime TIMESTAMPTZ NOT NULL,
+    timeBucketId INTEGER NOT NULL,
+    source INTEGER NOT NULL,           -- 2 for Twitter/X
+    label VARCHAR(32),                 -- Hashtag without #
+    content BYTEA NOT NULL,            -- JSON tweet data
+    contentSizeBytes INTEGER NOT NULL
+);
 ```
 
-### Account Management
+#### **Indexes**
+```sql
+CREATE INDEX data_entity_bucket_index2
+ON DataEntity (timeBucketId, source, label, contentSizeBytes);
+```
+
+#### **Data Format**
+- **Source**: `2` (DataSource.X for Twitter/X)
+- **TimeBucketId**: Hours since epoch (`timestamp // 3600`)
+- **Label**: Hashtag without # prefix, lowercase
+- **Content**: JSON bytes with complete tweet data
+- **URI**: Twitter status URL as unique identifier
+
+### **Content Structure**
+```json
+{
+  "id": "1928930860486570137",
+  "url": "https://x.com/user/status/1928930860486570137",
+  "text": "Just bought more bitcoin! 🚀 #bitcoin #crypto",
+  "author_username": "crypto_user",
+  "author_display_name": "Crypto Enthusiast",
+  "created_at": "2025-06-01T03:15:29+05:30",
+  "like_count": 42,
+  "retweet_count": 15,
+  "reply_count": 3,
+  "quote_count": 1,
+  "hashtags": ["#bitcoin", "#crypto"],
+  "media_urls": [],
+  "is_retweet": false,
+  "is_reply": false,
+  "conversation_id": "1928930860486570137",
+  "scraped_at": "2025-06-01T03:15:30+05:30"
+}
+```
+
+## 🔍 Data Verification
+
+### **PostgreSQL Queries**
+
+#### **Basic Statistics**
+```sql
+-- Total tweets stored
+SELECT COUNT(*) FROM DataEntity WHERE source = 2;
+
+-- Storage size
+SELECT 
+    COUNT(*) as total_tweets,
+    SUM(contentSizeBytes) as total_bytes,
+    COUNT(DISTINCT timeBucketId) as time_buckets,
+    COUNT(DISTINCT label) as unique_labels
+FROM DataEntity WHERE source = 2;
+```
+
+#### **Recent Data**
+```sql
+-- Latest tweets
+SELECT 
+    datetime,
+    label,
+    convert_from(content, 'UTF8')::json->>'text' as tweet_text
+FROM DataEntity 
+WHERE source = 2 
+ORDER BY datetime DESC 
+LIMIT 10;
+```
+
+#### **Top Hashtags**
+```sql
+-- Most popular labels
+SELECT 
+    label, 
+    COUNT(*) as count 
+FROM DataEntity 
+WHERE source = 2 AND label IS NOT NULL 
+GROUP BY label 
+ORDER BY count DESC 
+LIMIT 20;
+```
+
+#### **Hourly Distribution**
+```sql
+-- Tweets per hour
+SELECT 
+    DATE_TRUNC('hour', datetime) as hour,
+    COUNT(*) as tweets
+FROM DataEntity 
+WHERE source = 2 
+GROUP BY DATE_TRUNC('hour', datetime)
+ORDER BY hour DESC
+LIMIT 24;
+```
+
+### **Bittensor Compliance Check**
+```sql
+-- Verify schema compliance
+SELECT 
+    column_name,
+    data_type,
+    is_nullable
+FROM information_schema.columns 
+WHERE table_name = 'dataentity'
+ORDER BY ordinal_position;
+
+-- Verify data source
+SELECT DISTINCT source FROM DataEntity;
+
+-- Verify time bucket calculation
+SELECT 
+    datetime,
+    timebucketid,
+    EXTRACT(EPOCH FROM datetime)::bigint / 3600 as calculated_bucket
+FROM DataEntity 
+WHERE source = 2 
+LIMIT 5;
+```
+
+## 📈 Performance Monitoring
+
+### **Real-time Dashboard**
+```bash
+# Create monitoring script
+cat > monitor.sh << 'EOF'
+#!/bin/bash
+while true; do
+    clear
+    echo "🐘 Bittensor Mining Dashboard - $(date)"
+    echo "=================================="
+    
+    psql -h localhost -U postgres -d bittensor_mining -c "
+    SELECT 
+        'Total Tweets' as metric,
+        COUNT(*)::text as value
+    FROM DataEntity WHERE source = 2
+    UNION ALL
+    SELECT 
+        'Last Hour',
+        COUNT(*)::text
+    FROM DataEntity 
+    WHERE source = 2 AND datetime > NOW() - INTERVAL '1 hour'
+    UNION ALL
+    SELECT 
+        'Storage (MB)',
+        ROUND(SUM(contentSizeBytes)/1024.0/1024.0, 2)::text
+    FROM DataEntity WHERE source = 2;
+    "
+    
+    sleep 30
+done
+EOF
+
+chmod +x monitor.sh
+./monitor.sh
+```
+
+### **System Health Metrics**
+- **Working Proxies**: Active proxy count
+- **Working Accounts**: Available Twitter accounts
+- **Success Rate**: Request success percentage
+- **Auto Recoveries**: Automatic ban recoveries
+- **Storage Growth**: Real-time data accumulation
+
+## 🎯 Target Hashtags
+
+The system targets crypto and blockchain related content:
+
+### **Primary Targets**
+- `#bitcoin`, `#btc`, `#cryptocurrency`, `#crypto`
+- `#ethereum`, `#solana`, `#cardano`, `#polkadot`
+- `#defi`, `#web3`, `#blockchain`
+- `#bittensor`, `#tao`, `#ai`, `#artificialintelligence`
+
+### **Extended Targets**
+- `#bitcoinmining`, `#bitcoinnews`, `#bitcoinprice`
+- `#bitcointrading`, `#bitcointechnology`, `#bitcoincharts`
+- `#decentralizedfinance`, `#smartcontracts`
+
+## 🔧 Configuration
+
+### **Mining Parameters**
 ```python
-# Check account status
-from enhanced_account_manager import EnhancedAccountManager
-manager = EnhancedAccountManager()
-stats = manager.get_account_stats()
-print(stats)
+# Batch configuration
+batch_size = tweets_per_hour // 12  # 12 batches per hour
+batch_delay = 300  # 5 minutes between batches
+
+# Proxy settings
+max_concurrent = 5  # Concurrent requests
+proxy_timeout = 8   # Proxy test timeout
+
+# Account settings
+account_cooldown = 5  # Minutes between account usage
+success_threshold = 0.3  # Minimum success rate
+```
+
+### **Database Configuration**
+```python
+# PostgreSQL settings
+DB_HOST = "localhost"
+DB_PORT = 5432
+DB_NAME = "bittensor_mining"
+DB_USER = "postgres"
+DB_PASSWORD = "postgres"
+
+# Connection pool
+MAX_CONNECTIONS = 20
+CONNECTION_TIMEOUT = 30
 ```
 
 ## 🚨 Troubleshooting
 
-### Common Issues
+### **Common Issues**
 
-1. **No Available Accounts**
-   - Check account ban status
-   - Verify ct0 tokens are valid
-   - Reduce request frequency
-
-2. **Proxy Failures**
-   - Test proxy connectivity
-   - Check proxy credentials
-   - Rotate to different proxy pool
-
-3. **Database Errors**
-   - Verify PostgreSQL is running
-   - Check connection credentials
-   - Ensure sufficient disk space
-
-4. **Low Scraping Rate**
-   - Increase concurrent requests
-   - Reduce cooldown times
-   - Add more accounts/proxies
-
-### Debug Mode
+#### **PostgreSQL Connection Failed**
 ```bash
-# Enable debug logging
-export LOG_LEVEL=DEBUG
-python bittensor_optimized_miner.py
+# Check PostgreSQL status
+sudo systemctl status postgresql
+
+# Restart PostgreSQL
+sudo systemctl restart postgresql
+
+# Check connection
+psql -h localhost -U postgres -d bittensor_mining
 ```
 
-## 📋 API Reference
+#### **Proxy Issues**
+```bash
+# Test proxies
+python proxy_twitter_miner.py --test-proxies
 
-### Main Classes
+# Check proxy file format
+head -5 proxy.txt
+```
 
-#### `EnhancedAccountManager`
-- Manages 50 Twitter accounts and 500 proxies
-- Handles rotation, cooldowns, and ban detection
-- Provides account-proxy pairing
+#### **Account Bans**
+```bash
+# Check account status
+python proxy_twitter_miner.py --stats
 
-#### `EnhancedTwitterScraper`
-- High-performance async scraping
-- GraphQL API integration
-- Concurrent request management
+# Reset banned accounts (edit accounts manually)
+```
 
-#### `OptimizedDataStorage`
-- Dual database storage (PostgreSQL + SQLite)
-- Batch processing for efficiency
-- Bittensor format compatibility
+#### **Storage Issues**
+```bash
+# Check database size
+du -h /var/lib/postgresql/
 
-#### `BittensorOptimizedMiner`
-- Main orchestrator
-- Subnet scoring optimization
-- Performance monitoring
+# Check table status
+psql -h localhost -U postgres -d bittensor_mining -c "\dt+"
+```
 
-## 🔐 Security & Compliance
+### **Performance Optimization**
 
-### Data Protection
-- Compressed storage to minimize space
-- Automatic cleanup of old data
-- No personal data retention beyond necessary
+#### **Database Optimization**
+```sql
+-- Analyze table statistics
+ANALYZE DataEntity;
 
-### Rate Limiting
-- Account-level rate limiting
-- Proxy-level rate limiting
-- Global request throttling
+-- Reindex for performance
+REINDEX TABLE DataEntity;
 
-### Error Handling
-- Graceful degradation
-- Automatic recovery
-- Comprehensive logging
+-- Check index usage
+SELECT schemaname, tablename, indexname, idx_scan 
+FROM pg_stat_user_indexes 
+WHERE tablename = 'dataentity';
+```
+
+#### **System Optimization**
+```bash
+# Increase file descriptors
+ulimit -n 65536
+
+# Monitor system resources
+htop
+iotop
+```
+
+## 📊 Production Metrics
+
+### **Expected Performance**
+- **1,667 tweets/hour**: 40,008 tweets/day
+- **Storage growth**: ~50MB per 10K tweets
+- **Success rate**: 85-95% with good proxies
+- **Uptime**: 99%+ with proper monitoring
+
+### **Scaling Guidelines**
+- **Small scale**: 1,000 tweets/hour (24K/day)
+- **Medium scale**: 2,000 tweets/hour (48K/day)
+- **Large scale**: 3,000+ tweets/hour (72K+/day)
+
+## 🔐 Security
+
+### **Best Practices**
+- Use dedicated server for mining
+- Rotate proxy credentials regularly
+- Monitor for unusual activity
+- Keep Twitter accounts diverse
+- Use VPN for additional protection
+
+### **Data Protection**
+- PostgreSQL with proper authentication
+- Regular database backups
+- Encrypted connections (SSL)
+- Access logging and monitoring
 
 ## 📝 License
 
-MIT License - See LICENSE file for details
+This project is for educational and research purposes. Ensure compliance with Twitter's Terms of Service and applicable laws.
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create feature branch
-3. Make changes with tests
-4. Submit pull request
+3. Commit changes
+4. Push to branch
+5. Create Pull Request
 
 ## 📞 Support
 
 For issues and questions:
-- Create GitHub issue
 - Check troubleshooting section
-- Review logs for error details
-
-## 🎯 Roadmap
-
-### Upcoming Features
-- [ ] Machine learning for ban prediction
-- [ ] Dynamic proxy acquisition
-- [ ] Real-time trending topic detection
-- [ ] Advanced content filtering
-- [ ] Multi-platform support (Reddit, YouTube)
-
-### Performance Improvements
-- [ ] GPU acceleration for processing
-- [ ] Distributed scraping across multiple servers
-- [ ] Advanced caching mechanisms
-- [ ] Real-time data streaming
+- Review PostgreSQL logs
+- Monitor system resources
+- Verify proxy and account health
 
 ---
 
-**Built for Bittensor Subnet 13 - Optimized for 1M+ daily scrapes with maximum ban resistance**
+**🎉 Happy Mining! Your Bittensor-compliant Twitter mining system is ready for production use.**
